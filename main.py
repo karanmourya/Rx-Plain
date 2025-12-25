@@ -9,9 +9,15 @@ from langchain_ollama import OllamaEmbeddings
 import PIL.Image
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # --- SETUP ---
-# REPLACE THIS WITH YOUR ACTUAL KEY
-GOOGLE_API_KEY = "AIzaSyD-KgW98cOwR_8TIwSsUndpELiAZtfX6qI" 
+# Get key from environment variable
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise ValueError("GOOGLE_API_KEY not found in environment variables")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # --- CONFIGURATION ---
