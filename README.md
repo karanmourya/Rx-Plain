@@ -1,6 +1,8 @@
-# 🏥 Rx-Plain: AI Medical Report Interpreter
+# 🏥 Rx-Plain: AI Medical Report Interpreter (Local RAG Edition)
 
 **Rx-Plain** is an intelligent medical assistant designed to bridge the gap between complex diagnostic reports and patient understanding. It combines advanced Computer Vision, Local RAG (Retrieval-Augmented Generation), and LLM interpretation to provide accurate, simplified case explanations.
+
+**✨ This version runs 100% LOCALLY with no external API keys required!**
 
 ---
 
@@ -9,18 +11,18 @@
 The system operates in three distinct modules, mirroring a cognitive process:
 
 ### 1. **The Eye (Vision Module)**
-*   **Tech:** Google Gemini Vision (Flash model).
+*   **Tech:** Qwen3-VL (4B parameters) via Ollama
 *   **Function:** Reads medical report images (e.g., blood tests, lab reports).
 *   **Output:** Extracts structured data: Test Names, Result Values, Units, Reference Ranges, and flagged abnormalities.
 
 ### 2. **The Brain (Verification Module)**
-*   **Tech:** LangChain + Ollama (Local LLM) + ChromaDB (Vector Store).
+*   **Tech:** LangChain + Ollama + ChromaDB (Vector Store).
 *   **Function:** Verifies the extracted data against official medical guidelines.
 *   **Privacy:** Runs locally using **Ollama** and `nomic-embed-text` embeddings, ensuring no external leakage of RAG queries.
 *   **Source:** Uses a library of official PDF guidelines stored in `medical_guidelines/`.
 
 ### 3. **The Interpreter (Explanation Module)**
-*   **Tech:** Google Gemini (Generative AI).
+*   **Tech:** Qwen3-VL (4B parameters) via Ollama
 *   **Function:** Synthesizes the patient data and verified guidelines.
 *   **Output:** Generates a empathetic, plain-language explanation (e.g., in Hindi/English), explains "WHY" a result is abnormal, and suggests relevant questions for the doctor.
 
@@ -31,8 +33,8 @@ The system operates in three distinct modules, mirroring a cognitive process:
 *   **📄 OCR Extraction:** Converts image-based reports into machine-readable text.
 *   **🧠 Local Knowledge Base:** Uses verified medical documents (RAG) to ground answers, reducing hallucinations.
 *   **🌍 Multi-Language Support:** Can explain reports in local languages (currently configured for Hindi).
-*   **⚡ High Performance:** Uses `gemini-2.5-flash-lite` for speed and cost-efficiency.
-*   **🔒 Privacy-First:** Vector embeddings and similarity search run locally.
+*   **🔒 100% Privacy-First:** All models and embeddings run locally - no data leaves your machine.
+*   **💸 Cost-Free:** No API keys, no billing, no usage limits.
 
 ---
 
@@ -40,9 +42,18 @@ The system operates in three distinct modules, mirroring a cognitive process:
 
 ### Prerequisites
 *   **Python 3.12+**
-*   **Google API Key** (for Gemini)
 *   **Ollama Installed** locally ([Download Ollama](https://ollama.com/))
-    *   Pull the embedding model: `ollama pull nomic-embed-text`
+
+### Required Ollama Models
+Pull the required models:
+
+```bash
+# Vision + Text model (for OCR and generation)
+ollama pull qwen3-vl:4b
+
+# Embedding model (for RAG vector search)
+ollama pull nomic-embed-text
+```
 
 ### 1. Clone the Repository
 ```bash
@@ -51,16 +62,15 @@ cd Rx-Plain
 ```
 
 ### 2. Install Dependencies
-You can use `pip`:
 ```bash
 pip install -r requirements.txt
 ```
-*Note: This project uses `langchain-ollama`, `chromadb`, and `google-generativeai`.*
 
-### 3. Environment Configuration
-Create a `.env` file in the root directory:
-```env
-GOOGLE_API_KEY=your_actual_api_key_here
+*Note: This project uses `langchain-ollama`, `chromadb`, and `ollama`.*
+
+### 3. Verify Models are Installed
+```bash
+python check_models.py
 ```
 
 ---
