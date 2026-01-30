@@ -8,7 +8,7 @@ try:
 
     recommended_models = {
         "qwen3-vl:4b": "Vision + Text (Recommended for OCR and generation)",
-        "nomic-embed-text:latest": "Embeddings (Required for RAG)",
+        "nomic-embed-text": "Embeddings (Required for RAG)",
         "smollm2:latest": "Fast text generation (Optional)",
         "qwen2.5-coder:latest": "Code model (Optional)",
     }

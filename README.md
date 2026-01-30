@@ -35,6 +35,7 @@ The system operates in three distinct modules, mirroring a cognitive process:
 *   **🌍 Multi-Language Support:** Can explain reports in local languages (currently configured for Hindi).
 *   **🔒 100% Privacy-First:** All models and embeddings run locally - no data leaves your machine.
 *   **💸 Cost-Free:** No API keys, no billing, no usage limits.
+*   **🌐 Web Interface:** Beautiful drag-and-drop UI with FastAPI backend.
 
 ---
 
@@ -52,7 +53,7 @@ Pull the required models:
 ollama pull qwen3-vl:4b
 
 # Embedding model (for RAG vector search)
-ollama pull nomic-embed-text
+ollama pull nomic-embed-text:latest
 ```
 
 ### 1. Clone the Repository
@@ -85,15 +86,28 @@ python build_database.py
 ```
 *This will ingest the PDFs, chunk them, and create a local Vector Store in `chroma_db/`.*
 
-### Step 2: Run the Analyzer
+### Option A: CLI Version
 Place your medical report image (e.g., `report.jpg`) in the project folder and update the filename in `main.py` if necessary.
 Then run:
 ```bash
 python main.py
 ```
 
+### Option B: Web Interface (Recommended)
+Start the web server:
+```bash
+python app.py
+```
+Open your browser to: **http://localhost:8000**
+
+The web interface provides:
+- Drag & drop file upload
+- Language selection (English/Hindi)
+- Real-time processing status
+- Formatted results display
+
 ### Output Example
-The script will print:
+The system will provide:
 1.  **[1] Extracted Raw Data** from the image.
 2.  **[2] Verified Context** retrieved from your local RAG database.
 3.  **[3] Final Explanation** in the target language.
@@ -102,12 +116,9 @@ The script will print:
 
 ## 🗺️ Future Roadmap
 
-The project is currently a functional CLI prototype. Future plans include:
-
-*   **💻 Web Interface:** A **Streamlit** dashboard (dependency already verified) for easy file uploads and user interaction.
-*   **🔌 API Layer:** A **FastAPI** backend to serve mobile or web clients.
 *   **📱 Mobile App:** Integration with frontend frameworks.
 *   **🩺 Expanded KB:** Support for broader medical datasets beyond basic lab reports.
+*   **🎨 Enhanced UI:** More interactive features and better visualizations.
 
 ---
 
