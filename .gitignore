@@ -9,4 +9,9 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+# Generated database
 chroma_db/
+
+# User uploads
+uploads/

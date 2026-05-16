@@ -1,126 +1,131 @@
-# 🏥 Rx-Plain: AI Medical Report Interpreter (Local RAG Edition)
+# Rx-Plain
 
-**Rx-Plain** is an intelligent medical assistant designed to bridge the gap between complex diagnostic reports and patient understanding. It combines advanced Computer Vision, Local RAG (Retrieval-Augmented Generation), and LLM interpretation to provide accurate, simplified case explanations.
+AI-powered medical report interpreter that runs 100% locally. Upload a photo of a lab report and get a plain-language explanation — no API keys, no data leaves your machine.
 
-**✨ This version runs 100% LOCALLY with no external API keys required!**
+## How It Works
 
----
+The system uses a three-stage pipeline:
 
-## 🚀 How It Works
+```
+Image Upload → [1] Vision OCR → [2] RAG Verification → [3] Plain Language Explanation
+```
 
-The system operates in three distinct modules, mirroring a cognitive process:
+**Stage 1 — The Eye (OCR)**
+Qwen3-VL reads the report image and extracts test names, values, units, reference ranges, and flagged abnormalities.
 
-### 1. **The Eye (Vision Module)**
-*   **Tech:** Qwen3-VL (4B parameters) via Ollama
-*   **Function:** Reads medical report images (e.g., blood tests, lab reports).
-*   **Output:** Extracts structured data: Test Names, Result Values, Units, Reference Ranges, and flagged abnormalities.
+**Stage 2 — The Brain (RAG)**
+The extracted data is cross-referenced against medical guideline PDFs stored in a local ChromaDB vector database, using `nomic-embed-text` embeddings.
 
-### 2. **The Brain (Verification Module)**
-*   **Tech:** LangChain + Ollama + ChromaDB (Vector Store).
-*   **Function:** Verifies the extracted data against official medical guidelines.
-*   **Privacy:** Runs locally using **Ollama** and `nomic-embed-text` embeddings, ensuring no external leakage of RAG queries.
-*   **Source:** Uses a library of official PDF guidelines stored in `medical_guidelines/`.
+**Stage 3 — The Interpreter**
+Qwen3-VL synthesizes the patient data with verified guidelines and generates an empathetic, easy-to-understand explanation — including what abnormal results mean and what to ask your doctor.
 
-### 3. **The Interpreter (Explanation Module)**
-*   **Tech:** Qwen3-VL (4B parameters) via Ollama
-*   **Function:** Synthesizes the patient data and verified guidelines.
-*   **Output:** Generates a empathetic, plain-language explanation (e.g., in Hindi/English), explains "WHY" a result is abnormal, and suggests relevant questions for the doctor.
+## Prerequisites
 
----
+- Python 3.12+
+- [Ollama](https://ollama.com/) installed and running
 
-## ✨ Features
-
-*   **📄 OCR Extraction:** Converts image-based reports into machine-readable text.
-*   **🧠 Local Knowledge Base:** Uses verified medical documents (RAG) to ground answers, reducing hallucinations.
-*   **🌍 Multi-Language Support:** Can explain reports in local languages (currently configured for Hindi).
-*   **🔒 100% Privacy-First:** All models and embeddings run locally - no data leaves your machine.
-*   **💸 Cost-Free:** No API keys, no billing, no usage limits.
-*   **🌐 Web Interface:** Beautiful drag-and-drop UI with FastAPI backend.
-
----
-
-## 🛠️ Installation & Setup
-
-### Prerequisites
-*   **Python 3.12+**
-*   **Ollama Installed** locally ([Download Ollama](https://ollama.com/))
-
-### Required Ollama Models
 Pull the required models:
 
 ```bash
-# Vision + Text model (for OCR and generation)
 ollama pull qwen3-vl:4b
-
-# Embedding model (for RAG vector search)
 ollama pull nomic-embed-text:latest
 ```
 
-### 1. Clone the Repository
+Verify they're installed:
+
+```bash
+uv run python check_models.py
+```
+
+## Installation
+
 ```bash
 git clone https://github.com/karanmourya/Rx-Plain
 cd Rx-Plain
+uv sync
 ```
 
-### 2. Install Dependencies
+## Setup — Build the Knowledge Base
+
+1. Place medical guideline PDFs inside `medical_guidelines/`
+2. Build the vector database:
+
 ```bash
-pip install -r requirements.txt
+uv run python build_database.py
 ```
 
-*Note: This project uses `langchain-ollama`, `chromadb`, and `ollama`.*
+This ingests the PDFs, chunks them, and creates a local ChromaDB store in `chroma_db/`.
 
-### 3. Verify Models are Installed
+## Usage
+
+### Web Interface (recommended)
+
 ```bash
-python check_models.py
+uv run python app.py
 ```
 
----
+Open http://localhost:8000 — drag and drop a report image, choose a language, and get results.
 
-## 🏃 Usage Guide
-
-### Step 1: Build the Knowledge Base ("The Brain")
-Place your medical guideline PDFs inside the `medical_guidelines/` folder.
-Then run:
-```bash
-python build_database.py
-```
-*This will ingest the PDFs, chunk them, and create a local Vector Store in `chroma_db/`.*
-
-### Option A: CLI Version
-Place your medical report image (e.g., `report.jpg`) in the project folder and update the filename in `main.py` if necessary.
-Then run:
-```bash
-python main.py
-```
-
-### Option B: Web Interface (Recommended)
-Start the web server:
-```bash
-python app.py
-```
-Open your browser to: **http://localhost:8000**
-
-The web interface provides:
+Features:
 - Drag & drop file upload
-- Language selection (English/Hindi)
-- Real-time processing status
-- Formatted results display
+- Language selection (English / Hindi)
+- Real-time streaming progress
+- Three result cards: Extracted Data, Medical Guidelines, AI Explanation
 
-### Output Example
-The system will provide:
-1.  **[1] Extracted Raw Data** from the image.
-2.  **[2] Verified Context** retrieved from your local RAG database.
-3.  **[3] Final Explanation** in the target language.
+### CLI
 
----
+```bash
+uv run python main.py
+```
 
-## 🗺️ Future Roadmap
+Edit the `image_file` variable in `main.py` to point to your report image.
 
-*   **📱 Mobile App:** Integration with frontend frameworks.
-*   **🩺 Expanded KB:** Support for broader medical datasets beyond basic lab reports.
-*   **🎨 Enhanced UI:** More interactive features and better visualizations.
+## Project Structure
 
----
+```
+rx-plain/
+├── app.py                  # FastAPI web server
+├── main.py                 # CLI interface
+├── build_database.py       # PDF → ChromaDB vector store builder
+├── check_models.py         # Ollama model verification script
+├── medical_guidelines/     # Place your reference PDFs here
+├── example_reports/        # Sample reports for testing
+├── templates/
+│   └── index.html          # Web UI template
+├── static/
+│   ├── style.css           # UI styles
+│   └── script.js           # Client-side logic with SSE streaming
+├── chroma_db/              # Generated vector store (gitignored)
+└── uploads/                # Temporary upload storage (gitignored)
+```
 
-## ⚠️ Disclaimer
-*Rx-Plain is an AI tool for educational and informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.*
+## Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Vision / OCR | Qwen3-VL (4B) via Ollama |
+| Text Generation | Qwen3-VL (4B) / smollm2 via Ollama |
+| Embeddings | nomic-embed-text via Ollama |
+| Vector Store | ChromaDB |
+| Orchestration | LangChain |
+| Web Framework | FastAPI + Uvicorn |
+| Package Manager | uv |
+
+## Example Reports
+
+The `example_reports/` folder includes sample images and PDFs for testing:
+
+| File | Type |
+|------|------|
+| `blood-test-report.jpg` | Blood test report |
+| `diabetes-lab-report.pdf` | Diabetes lab report |
+| `doctor-handwritten-report.jpg` | Handwritten doctor notes |
+| `gallstones-report.jpg` | Gallstones imaging report |
+| `generic-lab-report.jpg` | General lab report |
+| `malaria-lab-report-1.png` | Malaria lab report (image) |
+| `malaria-lab-report-2.pdf` | Malaria lab report (PDF) |
+| `prescription-handwritten.png` | Handwritten prescription |
+
+## Disclaimer
+
+Rx-Plain is an AI tool for educational and informational purposes only. It is **not** a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.

@@ -107,7 +107,7 @@ def generate_response(patient_data, medical_guidelines, language="Hindi"):
 if __name__ == "__main__":
     check_ollama_models()
 
-    image_file = "malaria lab report.png"
+    image_file = "example_reports/malaria-lab-report-1.png"
 
     if os.path.exists(image_file):
         success, raw_text = extract_text_from_image(image_file)
